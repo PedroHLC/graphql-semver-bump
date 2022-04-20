@@ -88,7 +88,7 @@ function compareDeclarations(
     }
     return "MAJOR";
   } else if (uniqueRight.length > 0) {
-    if (uniqueRight.filter((d) => d.sensible)) {
+    if (uniqueRight.filter((d) => d.sensible).length > 0) {
       console.log(
         "New union-values or enum-values => Major bump found.",
         "\n\nAdditions:",
