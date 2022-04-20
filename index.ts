@@ -265,11 +265,13 @@ async function main(args: string[]): Promise<number> {
 
   if (baseSchema instanceof Error || baseSchema === null) {
     printf('Unable to retrieve "%s:%s" file.', baseRef, schemaFile);
+    console.log(baseSchema);
     return 2;
   }
 
   if (headSchema instanceof Error || headSchema === null) {
     printf('Unable to retrieve "%s:%s" file.', headRef, schemaFile);
+    console.log(headSchema);
     return 3;
   }
 
