@@ -280,7 +280,9 @@ async function main(args: string[]): Promise<number> {
     )
     : baseSemVer;
 
-  if (expectedSemVer.major <= 0) expectedSemVer.major = 1;
+  if (expectedSemVer.major <= 0) {
+    expectedSemVer = { major: 1, minor: 0, patch: 0 };
+  }
 
   if (!equalSemVer(headSemVer, expectedSemVer)) {
     printf(
