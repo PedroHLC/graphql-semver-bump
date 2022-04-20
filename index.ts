@@ -280,6 +280,8 @@ async function main(args: string[]): Promise<number> {
     )
     : baseSemVer;
 
+  if (expectedSemVer.major <= 0) expectedSemVer.major = 1;
+
   if (!equalSemVer(headSemVer, expectedSemVer)) {
     printf(
       '\n"%s" version mismatch. Expected: %s\n',
