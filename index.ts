@@ -22,7 +22,6 @@ async function gitGrab(
     const process = Deno.run({
       cmd: ["git", "show", path],
       stdout: "piped",
-      stderr: "piped",
     });
 
     const status = await process.status();
@@ -42,7 +41,6 @@ async function gitTest(): Promise<
     const process = Deno.run({
       cmd: ["git", "status"],
       stdout: "piped",
-      stderr: "piped",
     });
 
     const status = await process.status();
@@ -264,13 +262,13 @@ async function main(args: string[]): Promise<number> {
   const headSemVer = await gitGrabSemVer(decoder, headRef, semverFile);
 
   if (baseSchema instanceof Error || baseSchema === null) {
-    printf('Unable to retrieve "%s:%s" file.', baseRef, schemaFile);
+    printf('Unable to retrieve "%s:%s" file.\n', baseRef, schemaFile);
     console.log(baseSchema);
     return 2;
   }
 
   if (headSchema instanceof Error || headSchema === null) {
-    printf('Unable to retrieve "%s:%s" file.', headRef, schemaFile);
+    printf('Unable to retrieve "%s:%s" file.\n', headRef, schemaFile);
     console.log(headSchema);
     return 3;
   }
