@@ -246,6 +246,9 @@ async function main(args: string[]): Promise<number> {
   } else if (gitAvability === null) {
     console.log("Unexpected git error.");
     return 7;
+  } else if (gitAvability instanceof Error) {
+    console.log(gitAvability);
+    return 8;
   }
 
   const baseRef = Deno.args[0];
@@ -270,7 +273,7 @@ async function main(args: string[]): Promise<number> {
     return 3;
   }
 
-  const expectedSemVer = baseSchema !== headSchema
+  let expectedSemVer = baseSchema !== headSchema
     ? guessVersion(
       baseSemVer,
       compareDeclarations(
