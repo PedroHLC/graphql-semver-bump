@@ -3,6 +3,7 @@
 import { printf, sprintf } from "https://deno.land/std@0.135.0/fmt/printf.ts";
 import {
   introspectionFromSchema,
+  IntrospectionInputValue,
   IntrospectionOutputTypeRef,
   IntrospectionType,
 } from "https://deno.land/x/graphql_deno@v15.0.0/mod.ts";
@@ -90,7 +91,7 @@ function compareDeclarations(
   } else if (uniqueRight.length > 0) {
     if (uniqueRight.filter((d) => d.sensible).length > 0) {
       console.log(
-        "New union-values or enum-values => Major bump found.",
+        "New union-values, enum-values, input or non-null-input-field => Major bump found.",
         "\n\nAdditions:",
       );
       uniqueRight.forEach(printDeclaration);
@@ -135,6 +136,14 @@ function typeNotation(type: any): string {
   }
 }
 
+function argsNotation(args: readonly IntrospectionInputValue[]): string {
+  if (args.length > 0) {
+    return "(" + args.map((e) =>
+      e.name + ": " + typeNotation(e.type)
+    ).join(",") + ") => ";
+  } else return "";
+}
+
 function getTypeDeclaration(
   data: IntrospectionType,
 ): Declaration[] {
@@ -155,7 +164,7 @@ function getTypeDeclaration(
   if (data.kind === "OBJECT" || data.kind === "INTERFACE") {
     items = items.concat(data.fields.map((e) => ({
       field: data.name + "." + e.name,
-      notation: typeNotation(e.type),
+      notation: argsNotation(e.args) + typeNotation(e.type),
       sensible: false,
     })));
   }
@@ -164,7 +173,7 @@ function getTypeDeclaration(
     items = items.concat(data.inputFields.map((e) => ({
       field: data.name + "." + e.name,
       notation: typeNotation(e.type),
-      sensible: false,
+      sensible: e.type.kind === "NON_NULL",
     })));
   }
 
