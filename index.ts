@@ -10,7 +10,7 @@ import {
 import { makeExecutableSchema } from "https://deno.land/x/graphql_tools@0.0.2/mod.ts";
 
 type BumpKind = "MAJOR" | "MINOR" | "PATCH";
-type Declaration = { field: string; notation: string; sensible: boolean };
+type Declaration = { field: string; notation: string; parent: string };
 type SemVer = { major: number; minor: number; patch: number };
 
 async function gitGrab(
@@ -71,6 +71,7 @@ const printSemVer = (v: SemVer) =>
 const printDeclaration = (d: Declaration) =>
   console.log("  -", d.field, ":", d.notation);
 
+
 function compareDeclarations(
   before: Declaration[],
   after: Declaration[],
@@ -89,7 +90,13 @@ function compareDeclarations(
     }
     return "MAJOR";
   } else if (uniqueRight.length > 0) {
-    if (uniqueRight.filter((d) => d.sensible).length > 0) {
+    const isSensible = (d: Declaration) => {
+      if(d.parent !== '@') {
+        return (uniqueRight.findIndex((p: Declaration) => p.field === d.parent)) === -1
+      } else
+        return false;
+    }
+    if (uniqueRight.filter(isSensible).length > 0) {
       console.log(
         "New union-values, enum-values, input or non-null-input-field => Major bump found.",
         "\n\nAdditions:",
@@ -155,17 +162,17 @@ function getTypeDeclaration(
     items.push({
       field: data.name,
       notation: data.kind + ":" + interfaces,
-      sensible: false,
+      parent: '@',
     });
   } else {
-    items.push({ field: data.name, notation: data.kind, sensible: false });
+    items.push({ field: data.name, notation: data.kind, parent: '@' });
   }
 
   if (data.kind === "OBJECT" || data.kind === "INTERFACE") {
     items = items.concat(data.fields.map((e) => ({
       field: data.name + "." + e.name,
       notation: argsNotation(e.args) + typeNotation(e.type),
-      sensible: false,
+      parent: '@',
     })));
   }
 
@@ -173,7 +180,7 @@ function getTypeDeclaration(
     items = items.concat(data.inputFields.map((e) => ({
       field: data.name + "." + e.name,
       notation: typeNotation(e.type),
-      sensible: e.type.kind === "NON_NULL",
+      parent: (e.type.kind === "NON_NULL" ? data.name : '@'),
     })));
   }
 
@@ -181,7 +188,7 @@ function getTypeDeclaration(
     items = items.concat(data.enumValues.map((e) => ({
       field: data.name + "." + e.name,
       notation: "ENUM_VALUE",
-      sensible: true,
+      parent: data.name,
     })));
   }
 
@@ -189,7 +196,7 @@ function getTypeDeclaration(
     items = items.concat(data.possibleTypes.map((e) => ({
       field: data.name + "." + e.name,
       notation: "POSSIBLE_" + e.kind,
-      sensible: true,
+      parent: data.name,
     })));
   }
 
