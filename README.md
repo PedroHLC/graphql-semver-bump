@@ -2,7 +2,7 @@
 
 ### What?
 
-Deno script that diff two git-references of a GraphQL-schema-file and suggests bumps to a JSON-stored semver version.
+Deno script that diff two git-references of a GraphQL-schema-file and suggests bumps to a JSON-stored [semver](https://semver.org).
 
 ### How to run?
 
@@ -50,3 +50,25 @@ jobs:
             'graphql/my-project/schema.graphql' \
             'graphql/my-project/schema.semver.json' \
 ```
+
+
+## When does it requires a bump?
+
+- **MAJOR**: Bumps when there were removals, renames, when you added arguments to queries/mutations that didn't have any, added **new** non-null fields input, added **new** values to unions, or added **new** values to enums.
+
+- **MINOR**: Bumps when new fields, types, queries, or mutations are added.
+
+- **PATCH**: Bumps when you change deprecation flags or add new comments.
+
+## What does it produces?
+
+You will see something like this in the stdout:
+
+> New fields/types/queries => Minor bump found.
+> 
+> Additions:
+>   - Query.someQuery : SomeResult!
+> 
+> "this-branch" version mismatch. Expected 3.2.1
+
+The process will exit with success (exit code 0) when the version in the file is the one expected.
