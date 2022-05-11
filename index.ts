@@ -57,8 +57,11 @@ function guessVersion(previous: SemVer, compare: BumpKind): SemVer {
   const current = previous;
   if (compare === "MAJOR") {
     current.major += 1;
+    current.minor = 0;
+    current.patch = 0;
   } else if (compare === "MINOR") {
     current.minor += 1;
+    current.patch = 0;
   } else {
     current.patch += 1;
   }
